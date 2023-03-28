@@ -196,7 +196,7 @@ What's more, pb's `master ` branch is now accessible locally as pb/master.
 
 `git fetch <remote>`
 
-After doing this, you should have references to all teh branches from that remote, which you can merge in or inspect at any time.
+After doing this, you should have references to all the branches from that remote, which you can merge in or inspect at any time.
 
 If you clone a repository, the command automatically adds that remote repository under the name **origin**. So, `git fetch origin` fetches any new work that has been pushed to that server since you cloned (or last fetched from) it. It’s important to note that the `git fetch` command only downloads the data to your local repository — **it doesn’t automatically merge it with any of your work or modify what you’re currently working on**. **You have to merge it manually into your work when you are ready.**
 
