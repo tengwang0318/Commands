@@ -440,3 +440,62 @@ Next, the person who pushed the merged work decides to go back and rebase their 
 Now you’re both in a pickle. If you do a git pull, you’ll create a merge commit which includes both lines of history, and your repository will look like this:![16](pic/16.png)
 
 If you run a git log when your history looks like this, you’ll see two commits that have the same author, date, and message, which will be confusing. Furthermore, if you push this history back up to the server, you’ll reintroduce all those rebased commits to the central server, which can further confuse people. It’s pretty safe to assume that the other developer doesn’t want C4 and C6 to be in the history; that’s why they rebased in the first place.
+
+
+
+## Git on the server
+
+### the Protocols
+
+Git use 4 distinct protocols to transfer data: Local, HTTP, Secure Shell(SSH) and Git.
+
+#### Local Protocol
+
+Local protocol means that the remote repository is in anpther directory on the same host.
+
+If you have a shared mounted filesystem, then you can clone, push to, and pull from a local file- based repository. To clone a repository like this, or to add one as a remote to an existing project, use the path to the repository as the URL. For example, to clone a local repository, you can run something like this:
+
+```
+git clone /srv/git/project.git
+```
+
+or
+
+```
+git clone file:///srv/git/project.git
+```
+
+To add a local repository to an existing Git project, you can run something like this:
+
+```
+git remote add local_proj /srv/git/project.git
+```
+
+
+
+#### The HTTP Protocols
+
+There are two HTTP protocols: smart HTTP and dumb HTTP.
+
+##### Smart HTTP
+
+**Smart HTTP operates very similarly to the SSH or Git protocols but runs over standard HTTPS ports and can use various HTTP authentication mechanisms**, meaning it’s often easier on the user than something like SSH, since you can use things like username/password authentication rather than having to set up SSH keys.
+
+It has probably become the most popular way to use Git now, since it can be set up to both serve anonymously like the git:// protocol, and can also be pushed over with authentication and encryption like the SSH protocol. Instead of having to set up different URLs for these things, you can now use a single URL for both. If you try to push and the repository requires authentication (which it normally should), the server can prompt for a username and password. The same goes for read access.
+
+##### Dumb HTTP
+
+If the server does not respond with a Git HTTP smart service, the Git client will try to fall back to the simpler *Dumb* HTTP protocol. The Dumb protocol expects the bare Git repository to be served like normal files from the web server. The beauty of Dumb HTTP is the simplicity of setting it up. 
+
+##### The Pros
+
+We’ll concentrate on the pros of the Smart version of the HTTP protocol.
+
+The simplicity of having a single URL for all types of access and having the server prompt only when **authentication is needed makes things very easy for the end user**. **Being able to authenticate with a username and password is also a big advantage over SSH**, since users don’t have to generate SSH keys locally and upload their public key to the server before being able to interact with it. For less sophisticated users, or users on systems where SSH is less common, this is a major advantage in usability. It is also a very fast and efficient protocol, similar to the SSH one.
+
+You can also serve your repositories read-only over HTTPS, which means you can encrypt the content transfer; or you can go so far as to make the clients use specific signed SSL certificates.
+
+Another nice thing is that HTTP and HTTPS are such commonly used protocols that corporate firewalls are often set up to allow traffic through their ports.
+
+#### The SSH Protocol
+
