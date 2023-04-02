@@ -361,7 +361,71 @@ ZREVRANK key member
 
 
 
+## Transaction
 
+transaction is a set of commands, either all or none of these commands are executed.
 
+```
+MULTI
+...
+lots of commands 
+...
+EXEC
+```
 
+### Handle Error
 
+1. if there are some grammar error commands in the transaction, Redis will not execute any commands.
+2. if there are some errors which happen during running, Redis will execute all right commands. Due to the lack of ROLLBACK, the developer must take care of any possible error in advanced.
+
+### Watch
+
+**Watch** command will watch one or more keys and the transcation won't run if the value of these keys have been changed.
+
+```
+127.0.0.1:6379> set key 1
+OK
+127.0.0.1:6379> watch key
+OK
+127.0.0.1:6379> set key 2
+OK
+127.0.0.1:6379> multi 
+OK
+127.0.0.1:6379(TX)> set key 3
+QUEUED
+127.0.0.1:6379(TX)> exec
+(nil)
+127.0.0.1:6379> get key
+"2"
+```
+
+### Expire
+
+return 1 means EXPIRE is executed successfully and return 0 means key doesn't exist or set EXPIRE time unsuccessfully.
+
+```
+EXPIRE key seconds
+```
+
+**TTL** command will return the remaining time of the key before deleting.
+
+```
+TTL key
+```
+
+**TTL ** will return -2 if the key doesn't exist, will return -1 if key doesn't set **Time to Live** attribute, and wil return the exact time if the key doesn't expire.
+
+If you want to persist the key, just run `PERSIST key`.
+
+## Priority Queue
+
+$BRPOP$ is similar to $RPOP$, the difference between them is when the list doesn't have any element, the connection will be contained until there is a new element.
+
+```
+ERPOP key [key1, key2...] timeout
+```
+
+## Piplining
+
+When executing more than one command, every command will be executed until previous command was executed. 
+By using piplining, client could send more than one command at one time.
